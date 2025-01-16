@@ -1,8 +1,16 @@
 # console-flow Logging Library
 
-// TODO docs
+## Options - TODO
 
 CF_LOGGING_FORMAT
+
+## Development
+
+```sh
+$ npm install
+$ npm run build
+$ npm publish --access public
+```
 
 ## Roadmap
 
