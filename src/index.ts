@@ -1,3 +1,4 @@
 import {Logger} from './logger/Logger';
 
-export const CFLogger = Logger;
+export const FlowLogger = Logger;
+

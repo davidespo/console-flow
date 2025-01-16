@@ -1,0 +1,11 @@
+.editorconfig
+.eslintignore
+.eslintrc.json
+.gitignore
+.prettierrc.js
+tsconfig.json
+src
+test
+node_modules
+.git
+dist/test

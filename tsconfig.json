@@ -1,14 +1,20 @@
 {
-  "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "build",
-    "module": "commonjs" /* Specify what module code is generated. */,
-    "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-    "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
-    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
     "strict": true /* Enable all strict type-checking options. */,
-    "typeRoots": ["./node_modules/@types", "./src/types"]
+    "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
+    "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
+    "strictNullChecks": true,
+    "target": "ES2024" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+    "moduleResolution": "node10" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
+    "module": "CommonJS" /* Specify what module code is generated. */,
+    "declaration": true /* Generates corresponding '.d.ts' file. */,
+    "isolatedModules": true /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */,
+    "noEmit": true /* Do not emit outputs. */,
+    "outDir": "dist",
+    "sourceMap": true /* Generates corresponding '.map' file. */,
+    "types": ["./src/types/console.d.ts", "node"],
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  // "include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

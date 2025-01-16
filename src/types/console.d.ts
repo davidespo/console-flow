@@ -1,3 +1,5 @@
+import { LogFunc } from "../logger/Logger";
+
 // types/console.d.ts
 declare global {
   interface Console {
@@ -5,8 +7,8 @@ declare global {
     critical(message?: unknown, ...optionalParams: unknown[]): void;
     securityAlert(message?: unknown, ...optionalParams: unknown[]): void;
     rainbow(message?: unknown, ...optionalParams: unknown[]): void;
-    // setLevel(level: LoggerLiteLevelName): Console;
-    // __log?: LoggerLiteOptions;
+    setLevel(level: string): Console;
+    __log: LogFunc | undefined;
   }
 }
 

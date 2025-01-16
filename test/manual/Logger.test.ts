@@ -1,6 +1,6 @@
-import {Logger} from '../../src/logger/Logger';
+import {FlowLogger} from '@src/index';
 
-const logger = new Logger({
+const logger = new FlowLogger({
   format: 'json',
   prefix: {
     value: 'test-logger',

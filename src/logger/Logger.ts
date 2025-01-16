@@ -17,7 +17,7 @@ import {addColor, colorStack} from '../colors';
 import {buildTimestampGenerator} from '../timestamp';
 
 type LogContext = unknown;
-type LogFunc = (
+export type LogFunc = (
   arg1?: string | Error | LogContext,
   arg2?: Error | LogContext,
   arg3?: LogContext,
@@ -50,7 +50,7 @@ type LogEntryData = LogEntry & {
  *# for filenames and line numbers in the console formatter.
  */
 const compileMessage = _.template(
-  "<%= prefix %> - [<%= level %>][<%= timestamp %>]<%= metadata.filename ? '[' + metadata.filename + ']' : '' %> <%= message %> <%= metadata.context %><%= metadata.error.stack ? '\\n' + metadata.error.stack : '' %>",
+  "<%= prefix %> - [<%= level %>][<%= timestamp %>]<%= metadata.filename ? '[' + metadata.filename + ']' : '' %> <%= message %> <%= metadata.context %><%= (metadata.error && metadata.error.stack) ? '\\n' + metadata.error.stack : '' %>",
 );
 
 export type LoggerPlugin = {
@@ -61,30 +61,18 @@ export type LoggerPlugin = {
 
 export class Logger {
   private static plugins: LoggerPlugin[] = [];
-
-  /**
-   * Order matters.
-   * @param plugin
-   */
-  static addPlugin(plugin: LoggerPlugin): void {
-    const exists = Logger.plugins.find(p => p.name === plugin.name);
-    if (exists) {
-      // remove older one and add new one
-      Logger.plugins = Logger.plugins.filter(p => p.name !== plugin.name);
+  
+    private readonly coloredPrefix: string;
+    private readonly getTimestamp: () => string;
+    private readonly __log: LogFunc = console.__log ?? console.log;
+    constructor(private readonly options: LoggerOptions) {
+      this.coloredPrefix = !options.prefix
+        ? ''
+        : options.prefix?.color
+          ? addColor(options.prefix.value, options.prefix.color)
+          : options.prefix.value;
+      this.getTimestamp = buildTimestampGenerator(options.timestamp);
     }
-    Logger.plugins.push(plugin);
-  }
-
-  private readonly coloredPrefix: string;
-  private readonly getTimestamp: () => string;
-  constructor(private readonly options: LoggerOptions) {
-    this.coloredPrefix = !options.prefix
-      ? ''
-      : options.prefix?.color
-        ? addColor(options.prefix.value, options.prefix.color)
-        : options.prefix.value;
-    this.getTimestamp = buildTimestampGenerator(options.timestamp);
-  }
 
   protected _asJson(
     level: string,
@@ -212,7 +200,7 @@ export class Logger {
         }
       }
     }
-    console.log(this.asLog(level, arg1, arg2, arg3));
+    this.__log(this.asLog(level, arg1, arg2, arg3));
   }
 
   log: LogFunc = (
@@ -270,7 +258,28 @@ export class Logger {
     return this;
   }
 
-  static configureConsole(logger?: Logger): void {
+    /**
+   * Order matters.
+   * @param plugin
+   */
+  static addPlugin(plugin: LoggerPlugin): void {
+    const exists = Logger.plugins.find(p => p.name === plugin.name);
+    if (exists) {
+      // remove older one and add new one
+      Logger.plugins = Logger.plugins.filter(p => p.name !== plugin.name);
+    }
+    Logger.plugins.push(plugin);
+  }
+
+  static configureConsole(args?: Logger | LoggerOptions): void {
+    let logger: Logger | undefined;
+    if (args) {
+      if (args instanceof Logger) {
+        logger = args;
+      } else if (_.isPlainObject(args)) {
+        logger = new Logger(args);
+      }
+    }
     if (!logger) {
       // TODO environment variables
       logger = new Logger({
@@ -278,9 +287,11 @@ export class Logger {
           'cli') as LoggerOptions['format'],
       });
     }
-    const console = global.console;
-    console.log = logger.log.bind(logger);
+    if (!console.__log) {
+      console.__log = console.log
+    }
     console.info = logger.info.bind(logger);
+    console.log = console.info;
     console.warn = logger.warn.bind(logger);
     console.error = logger.error.bind(logger);
     console.debug = logger.debug.bind(logger);
@@ -289,6 +300,9 @@ export class Logger {
     console.critical = logger.critical.bind(logger);
     console.securityAlert = logger.securityAlert.bind(logger);
     console.rainbow = logger.rainbow.bind(logger);
-    // console.setLevel = logger.setLevel;
+    console.setLevel = (level: string) => {
+      logger.setLevel(level);
+      return console;
+    };
   }
 }

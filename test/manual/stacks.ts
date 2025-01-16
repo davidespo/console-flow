@@ -1,7 +1,7 @@
-import {Logger} from '../../src/logger/Logger';
+import {FlowLogger} from '@src/index';
 import {recurseAndThrow} from '../utils';
 
-const logger = new Logger({
+const logger = new FlowLogger({
   // format: 'prettyJson',
   filename: 'stacks.log',
   prefix: {value: 'stacks', color: 'red_800'},

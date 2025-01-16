@@ -1,24 +1,28 @@
 {
-  "name": "console-flow",
+  "name": "@de44/console-flow",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "gts lint",
-    "clean": "gts clean",
-    "build": "tsc"
+    "build": "tsup",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": [],
+  "keywords": [
+    "logging",
+    "console"
+  ],
   "author": "David Esposito",
-  "license": "ISC",
+  "license": "MIT",
   "description": "",
   "devDependencies": {
     "@types/lodash": "^4.17.14",
     "@types/moment": "^2.11.29",
-    "@types/node": "^22.7.5",
-    "gts": "^6.0.2",
+    "@types/node": "^22.10.7",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.3"
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "chalk": "^2.4.2",
