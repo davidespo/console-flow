@@ -50,7 +50,7 @@ type LogEntryData = LogEntry & {
  *# for filenames and line numbers in the console formatter.
  */
 const compileMessage = _.template(
-  "<%= prefix %> - [<%= level %>][<%= timestamp %>]<%= metadata.filename ? '[' + metadata.filename + ']' : '' %> <%= message %> <%= metadata.context %><%= (metadata.error && metadata.error.stack) ? '\\n' + metadata.error.stack : '' %>",
+  "<%= prefix ? prefix + ' - ' : '' %>[<%= level %>][<%= timestamp %>]<%= metadata.filename ? '[' + metadata.filename + ']' : '' %> <%= message %> <%= metadata.context %><%= (metadata.error && metadata.error.stack) ? '\\n' + metadata.error.stack : '' %>",
 );
 
 export type LoggerPlugin = {

@@ -257,7 +257,7 @@ var buildTimestampGenerator = (timestamp) => {
 // src/logger/Logger.ts
 var _2 = require("lodash");
 var compileMessage = _2.template(
-  "<%= prefix %> - [<%= level %>][<%= timestamp %>]<%= metadata.filename ? '[' + metadata.filename + ']' : '' %> <%= message %> <%= metadata.context %><%= (metadata.error && metadata.error.stack) ? '\\n' + metadata.error.stack : '' %>"
+  "<%= prefix ? prefix + ' - ' : '' %>[<%= level %>][<%= timestamp %>]<%= metadata.filename ? '[' + metadata.filename + ']' : '' %> <%= message %> <%= metadata.context %><%= (metadata.error && metadata.error.stack) ? '\\n' + metadata.error.stack : '' %>"
 );
 var Logger = class _Logger {
   constructor(options) {
