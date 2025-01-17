@@ -32,3 +32,15 @@ console.log('Hello, world!', {
     nested: {foo: 'bar', baz: 3.1415, qux: true},
   },
 });
+
+console.log({
+  foo: 'bar',
+  baz: 3.1415,
+  qux: true,
+  nested: {
+    foo: 'bar',
+    baz: 3.1415,
+    qux: true,
+    nested: {foo: 'bar', baz: 3.1415, qux: true},
+  },
+});

@@ -87,7 +87,8 @@ export class Logger {
       if (error) {
         message = error.message;
       } else if (typeof context !== 'undefined') {
-        message = JSON.stringify(context);
+        // message = JSON.stringify(context);
+        message = '';
       } else {
         message = '\n';
       }
