@@ -44,3 +44,8 @@ console.log({
     nested: {foo: 'bar', baz: 3.1415, qux: true},
   },
 });
+
+console.table([
+  {foo: 'bar', baz: 3.1415, qux: true},
+  {foo: 'bar', baz: 3.1415, qux: true},
+]);
