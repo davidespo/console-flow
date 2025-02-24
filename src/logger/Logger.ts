@@ -61,18 +61,18 @@ export type LoggerPlugin = {
 
 export class Logger {
   private static plugins: LoggerPlugin[] = [];
-  
-    private readonly coloredPrefix: string;
-    private readonly getTimestamp: () => string;
-    private readonly __log: LogFunc = console.__log ?? console.log;
-    constructor(private readonly options: LoggerOptions) {
-      this.coloredPrefix = !options.prefix
-        ? ''
-        : options.prefix?.color
-          ? addColor(options.prefix.value, options.prefix.color)
-          : options.prefix.value;
-      this.getTimestamp = buildTimestampGenerator(options.timestamp);
-    }
+
+  private readonly coloredPrefix: string;
+  private readonly getTimestamp: () => string;
+  private readonly __log: LogFunc = console.__log ?? console.log;
+  constructor(private readonly options: LoggerOptions) {
+    this.coloredPrefix = !options.prefix
+      ? ''
+      : options.prefix?.color
+      ? addColor(options.prefix.value, options.prefix.color)
+      : options.prefix.value;
+    this.getTimestamp = buildTimestampGenerator(options.timestamp);
+  }
 
   protected _asJson(
     level: string,
@@ -165,6 +165,10 @@ export class Logger {
         messageData.level = level.styledName;
         messageData.timestamp = level.secondary(entry.timestamp);
         if (messageData.message) {
+          const message = messageData.message;
+          messageData.message = message.includes('╔')
+            ? '\\n' + message
+            : message;
           messageData.message = level.primary(entry.message);
         }
         metaContext = level.secondary(metaContext);
@@ -259,7 +263,7 @@ export class Logger {
     return this;
   }
 
-    /**
+  /**
    * Order matters.
    * @param plugin
    */
@@ -289,7 +293,7 @@ export class Logger {
       });
     }
     if (!console.__log) {
-      console.__log = console.log
+      console.__log = console.log;
     }
     console.info = logger.info.bind(logger);
     console.log = console.info;
