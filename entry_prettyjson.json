@@ -1,0 +1,6 @@
+{
+  "level": "INFO",
+  "timestamp": "2025-04-19T10:01:44",
+  "message": "Pre-colored message query: \"[94mSELECT[0m [37m\"UserRow\"[0m[37m.[0m[37m\"id\"[0m [94mAS[0m [37m\"UserRow_id\"[0m[37m,[0m [37m\"UserRow\"[0m[37m.[0m[37m\"createdAt\"[0m [94mAS[0m [37m\"UserRow_createdAt\"[0m[37m,[0m [37m\"UserRow\"[0m[37m.[0m[37m\"updatedAt\"[0m [94mAS[0m [37m\"UserRow_updatedAt\"[0m[37m,[0m [37m\"UserRow\"[0m[37m.[0m[37m\"email\"[0m [94mAS[0m [37m\"UserRow_email\"[0m [94mFROM[0m [37m\"user_row\"[0m [37m\"UserRow\"[0m [94mORDER BY[0m [37m\"UserRow\"[0m[37m.[0m[37m\"email\"[0m [94mASC[0m [94mLIMIT[0m [32m10[0m\"",
+  "metadata": {}
+}

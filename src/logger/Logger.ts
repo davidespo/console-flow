@@ -15,6 +15,7 @@ import {
 import _ = require('lodash');
 import {addColor, colorStack} from '../colors';
 import {buildTimestampGenerator} from '../timestamp';
+import {writeFileSync} from 'fs';
 
 type LogContext = unknown;
 export type LogFunc = (
@@ -144,15 +145,27 @@ export class Logger {
     arg3: unknown,
   ): string | LogEntry {
     const entry = this.asJson(level.key, arg1, arg2, arg3);
+    // TODO: move pre-colored fix here
     switch (this.options.format) {
       case 'json':
+        if (entry.message.includes('\\u001b')) {
+          entry.message = entry.message.replace(/\\+u001b\[\d+m/g, '');
+        }
         return entry;
-      case 'prettyJson':
-        return level.primary(JSON.stringify(entry, null, 2));
+      case 'prettyJson': {
+        let logContent = JSON.stringify(entry, null, 2);
+        if (logContent.includes('\\u001b')) {
+          logContent = logContent.replace(/\\+u001b/g, '\u001b');
+        }
+        return level.primary(logContent);
+      }
       case undefined:
       case 'cli':
       case 'browser':
       default: {
+        if (entry.message.includes('\\u001b')) {
+          entry.message = entry.message.replace(/\\u001b/g, '\u001b');
+        }
         const messageData = _.cloneDeep(entry) as LogEntryData;
         messageData.prefix = this.coloredPrefix;
         const jsonMessageContext = entry.metadata.context as unknown;
