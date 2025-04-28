@@ -151,7 +151,7 @@ export class Logger {
         if (entry.message.includes('\\u001b')) {
           entry.message = entry.message.replace(/\\+u001b\[\d+m/g, '');
         }
-        return entry;
+        return JSON.stringify(entry);
       case 'prettyJson': {
         let logContent = JSON.stringify(entry, null, 2);
         if (logContent.includes('\\u001b')) {
