@@ -115,3 +115,93 @@ export const addColor = (
   }
   return chalk.hex(color)(content);
 };
+
+/**
+ * ANSI color code patterns
+ */
+const ANSI_COLOR_PATTERNS = {
+  // Matches ANSI color codes like \u001b[32m, \u001b[0m, etc.
+  ESCAPED_ANSI: /\\u001b\[\d+m/g,
+  // Matches raw ANSI color codes like [32m, [0m, etc.
+  RAW_ANSI: /\u001b\[\d+m/g,
+  // Matches any ANSI escape sequence
+  ANY_ANSI: /\u001b\[[\x30-\x3f]*[\x20-\x2f]*[\x40-\x7e]/g,
+  // Matches escaped ANSI escape sequences
+  ESCAPED_ANY_ANSI: /\\u001b\[[\x30-\x3f]*[\x20-\x2f]*[\x40-\x7e]/g,
+};
+
+/**
+ * Strips all ANSI color codes from a string
+ */
+export const stripAnsiColors = (text: string): string => {
+  return text
+    .replace(ANSI_COLOR_PATTERNS.ESCAPED_ANSI, '')
+    .replace(ANSI_COLOR_PATTERNS.RAW_ANSI, '')
+    .replace(ANSI_COLOR_PATTERNS.ANY_ANSI, '')
+    .replace(ANSI_COLOR_PATTERNS.ESCAPED_ANY_ANSI, '');
+};
+
+/**
+ * Detects if a string contains ANSI color codes
+ */
+export const hasAnsiColors = (text: string): boolean => {
+  return (
+    ANSI_COLOR_PATTERNS.ESCAPED_ANSI.test(text) ||
+    ANSI_COLOR_PATTERNS.RAW_ANSI.test(text) ||
+    ANSI_COLOR_PATTERNS.ANY_ANSI.test(text) ||
+    ANSI_COLOR_PATTERNS.ESCAPED_ANY_ANSI.test(text)
+  );
+};
+
+/**
+ * Converts escaped ANSI codes to raw ANSI codes
+ */
+export const unescapeAnsiCodes = (text: string): string => {
+  return text.replace(/\\u001b/g, '\u001b');
+};
+
+/**
+ * Converts raw ANSI codes to escaped ANSI codes
+ */
+export const escapeAnsiCodes = (text: string): string => {
+  return text.replace(/\u001b/g, '\\u001b');
+};
+
+/**
+ * Applies level colors to text, stripping existing colors first
+ */
+export const applyLevelColors = (
+  text: string,
+  levelColor: (text: string) => string,
+): string => {
+  const strippedText = stripAnsiColors(text);
+  return levelColor(strippedText);
+};
+
+/**
+ * Color management strategy for different logging formats
+ */
+export const ColorStrategy = {
+  /**
+   * For JSON formats - strip all colors completely
+   */
+  json: (text: string): string => stripAnsiColors(text),
+
+  /**
+   * For console formats - preserve existing colors or apply level colors
+   */
+  console: (text: string, levelColor: (text: string) => string): string => {
+    if (hasAnsiColors(text)) {
+      // If text already has colors, unescape them and preserve
+      return unescapeAnsiCodes(text);
+    } else {
+      // If no colors, apply level colors
+      return levelColor(text);
+    }
+  },
+
+  /**
+   * For pretty JSON - strip colors but keep the format clean
+   */
+  prettyJson: (text: string): string => stripAnsiColors(text),
+};

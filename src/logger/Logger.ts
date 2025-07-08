@@ -13,7 +13,7 @@ import {
   LoggerLevel,
 } from '../levels';
 import _ = require('lodash');
-import {addColor, colorStack} from '../colors';
+import {addColor, colorStack, ColorStrategy} from '../colors';
 import {buildTimestampGenerator} from '../timestamp';
 import {writeFileSync} from 'fs';
 
@@ -145,54 +145,83 @@ export class Logger {
     arg3: unknown,
   ): string | LogEntry {
     const entry = this.asJson(level.key, arg1, arg2, arg3);
-    // TODO: move pre-colored fix here
+
     switch (this.options.format) {
       case 'json':
-        if (entry.message.includes('\\u001b')) {
-          entry.message = entry.message.replace(/\\+u001b\[\d+m/g, '');
+        // Strip all colors for JSON format
+        entry.message = ColorStrategy.json(entry.message);
+        // Also strip colors from context if it's a string
+        if (typeof entry.metadata.context === 'string') {
+          entry.metadata.context = ColorStrategy.json(entry.metadata.context);
         }
         return JSON.stringify(entry);
+
       case 'prettyJson': {
-        let logContent = JSON.stringify(entry, null, 2);
-        if (logContent.includes('\\u001b')) {
-          logContent = logContent.replace(/\\+u001b/g, '\u001b');
+        // Strip all colors for pretty JSON format
+        entry.message = ColorStrategy.prettyJson(entry.message);
+        // Also strip colors from context if it's a string
+        if (typeof entry.metadata.context === 'string') {
+          entry.metadata.context = ColorStrategy.prettyJson(
+            entry.metadata.context,
+          );
         }
+        const logContent = JSON.stringify(entry, null, 2);
         return level.primary(logContent);
       }
+
       case undefined:
       case 'cli':
       case 'browser':
       default: {
-        if (entry.message.includes('\\u001b')) {
-          entry.message = entry.message.replace(/\\u001b/g, '\u001b');
-        }
+        // For console formats, handle colors intelligently
         const messageData = _.cloneDeep(entry) as LogEntryData;
         messageData.prefix = this.coloredPrefix;
+
         const jsonMessageContext = entry.metadata.context as unknown;
-        let metaContext = jsonMessageContext
-          ? JSON.stringify(jsonMessageContext)
-          : '';
-        if (metaContext.length > 120) {
-          metaContext = JSON.stringify(jsonMessageContext, null, 2);
+        let metaContext = '';
+
+        if (jsonMessageContext) {
+          if (typeof jsonMessageContext === 'string') {
+            // If context is already a string, apply color strategy directly
+            metaContext = ColorStrategy.console(
+              jsonMessageContext,
+              level.secondary,
+            );
+          } else {
+            // If context is an object, stringify it first
+            metaContext = JSON.stringify(jsonMessageContext);
+            if (metaContext.length > 120) {
+              metaContext = JSON.stringify(jsonMessageContext, null, 2);
+            }
+            metaContext = ColorStrategy.console(metaContext, level.secondary);
+          }
         }
+
         messageData.level = level.styledName;
         messageData.timestamp = level.secondary(entry.timestamp);
+
+        // Apply color strategy to message
         if (messageData.message) {
-          messageData.message = level.primary(entry.message);
+          messageData.message = ColorStrategy.console(
+            entry.message,
+            level.primary,
+          );
         }
-        metaContext = level.secondary(metaContext);
+
         messageData.metadata.context = metaContext;
+
         if (messageData.metadata.error?.stack) {
           messageData.metadata.error.stack = colorStack(
             messageData.metadata.error.stack,
           );
         }
+
         if (messageData.metadata.filename) {
           messageData.metadata.filename = level.secondary(
-            messageData.metadata.filename,
+            entry.metadata.filename!,
           );
         }
-        // Not sure if these are actually different... will see if chalk works in the browser
+
         return compileMessage(messageData);
       }
     }
