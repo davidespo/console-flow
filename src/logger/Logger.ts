@@ -12,10 +12,9 @@ import {
   LOGGER_LEVELS,
   LoggerLevel,
 } from '../levels';
-import _ = require('lodash');
+import _ from 'lodash';
 import {addColor, colorStack, ColorStrategy} from '../colors';
 import {buildTimestampGenerator} from '../timestamp';
-import {writeFileSync} from 'fs';
 import {GcpLogEntryBuilder} from './GcpLogEntryBuilder';
 
 type LogContext = unknown;
@@ -61,6 +60,37 @@ export type LoggerPlugin = {
   processEntry: (entry: LogEntry) => LogEntry;
 };
 
+/**
+ * A flexible logging utility that provides multiple output formats and log levels.
+ *
+ * Features:
+ * - Multiple output formats (CLI, JSON, Pretty JSON, GCP Cloud Logging)
+ * - Customizable log levels with color support
+ * - Timestamp formatting options
+ * - Error stack trace handling
+ * - Context/metadata support
+ * - Plugin system for log processing
+ *
+ * @example
+ * ```typescript
+ * // Basic usage
+ * const logger = new Logger({format: 'cli'});
+ * logger.info('Hello world');
+ *
+ * // With context
+ * logger.info('User logged in', {userId: 123});
+ *
+ * // With error
+ * logger.error('Operation failed', new Error('DB connection error'));
+ *
+ * // Configure console
+ * Logger.configureConsole({
+ *   format: 'cli',
+ *   prefix: {value: 'my-app', color: 'blue'}
+ * });
+ * console.info('Now uses enhanced logging');
+ * ```
+ */
 export class Logger {
   private static plugins: LoggerPlugin[] = [];
 
@@ -317,8 +347,35 @@ export class Logger {
   }
 
   /**
-   * Order matters.
-   * @param plugin
+   * Adds a plugin to the logger's processing pipeline. If a plugin with the same name already exists,
+   * it will be replaced with the new version.
+   *
+   * Plugins are executed in the order they are added and can modify log entries before they are output.
+   * This allows for custom processing like:
+   * - Adding additional metadata
+   * - Filtering sensitive information
+   * - Transforming log formats
+   * - Adding tracing or correlation IDs
+   *
+   * @param plugin The plugin to add, must implement the LoggerPlugin interface with:
+   *   - name: Unique identifier for the plugin
+   *   - version: Plugin version string
+   *   - processEntry: Function that takes and returns a LogEntry
+   *
+   * @example
+   * ```typescript
+   * Logger.addPlugin({
+   *   name: 'sensitive-data-filter',
+   *   version: '1.0.0',
+   *   processEntry: (entry) => {
+   *     // Remove sensitive data from logs
+   *     if (entry.metadata.context?.password) {
+   *       entry.metadata.context.password = '[REDACTED]';
+   *     }
+   *     return entry;
+   *   }
+   * });
+   * ```
    */
   static addPlugin(plugin: LoggerPlugin): void {
     const exists = Logger.plugins.find(p => p.name === plugin.name);
@@ -329,6 +386,36 @@ export class Logger {
     Logger.plugins.push(plugin);
   }
 
+  /**
+   * Configures the global console object to use enhanced logging capabilities.
+   * This method replaces standard console methods with Logger functionality,
+   * providing structured logging, colored output, and additional log levels.
+   *
+   * @param args Optional Logger instance or LoggerOptions object to configure the console logger
+   *             If not provided, defaults to CLI format or format specified in CF_LOGGING_FORMAT env var
+   *
+   * @example
+   * ```typescript
+   * // Basic configuration
+   * Logger.configureConsole();
+   *
+   * // Configure with options
+   * Logger.configureConsole({
+   *   format: 'cli',
+   *   prefix: {value: 'my-app', color: 'blue'},
+   *   timestamp: 'ISO8601'
+   * });
+   *
+   * // Configure with existing logger instance
+   * const logger = new Logger({format: 'json'});
+   * Logger.configureConsole(logger);
+   * ```
+   *
+   * After configuration, enhanced console methods are available:
+   * - Standard: log, info, warn, error, debug, trace
+   * - Additional: success, critical, securityAlert, rainbow
+   * - Utility: setLevel
+   */
   static configureConsole(args?: Logger | LoggerOptions): void {
     let logger: Logger | undefined;
     if (args) {

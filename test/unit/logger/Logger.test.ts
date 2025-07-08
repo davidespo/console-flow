@@ -208,8 +208,6 @@ describe('Logger', () => {
       const output = consoleCapture.output[0].trim();
       // Strip ANSI color codes
       const outputStripped = output.replace(/\u001b\[[0-9;]*m/g, '');
-      // Log the output for debugging
-      console.log('Rainbow output:', JSON.stringify(outputStripped));
 
       // Should contain the message and emojis
       expect(outputStripped).toContain('1 million users milestone reached!');
@@ -231,8 +229,6 @@ describe('Logger', () => {
       const output = consoleCapture.output[0].trim();
       // Strip ANSI color codes
       const outputStripped = output.replace(/\u001b\[[0-9;]*m/g, '');
-      // Log the output for debugging
-      console.log('Complex rainbow output:', JSON.stringify(outputStripped));
 
       // Should contain the message and emojis
       expect(outputStripped).toContain('Special rainbow message!');

@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import _ = require('lodash');
+import _ from 'lodash';
 import {z} from 'zod';
 
 export const HexColorSchema = z
