@@ -3,6 +3,7 @@ import {z} from 'zod';
 
 export const TimestampOptionSchema = z.union([
   z.literal('ISO8601'),
+  z.literal('RFC3339'),
   z.literal('locale'),
   z.literal('unix'),
   z.string(),
@@ -18,6 +19,8 @@ export const buildTimestampGenerator = (
     case undefined:
     case 'ISO8601':
       return () => new Date().toISOString().substring(0, 19);
+    case 'RFC3339':
+      return () => new Date().toISOString();
     case 'unix':
       return () => Date.now().toString();
     case 'locale':

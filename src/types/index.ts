@@ -1,5 +1,6 @@
 import {z} from 'zod';
 import {TimestampOptionSchema} from '../timestamp';
+import {GcpLoggerOptionsSchema} from './gcp';
 
 export const LoggerOptionsSchema = z.object({
   prefix: z
@@ -20,6 +21,10 @@ export const LoggerOptionsSchema = z.object({
   format: z
     .enum(['gcp', 'cloud', 'json', 'prettyJson', 'cli', 'browser'])
     .optional(),
+  /**
+   * GCP-specific options (used when format is 'gcp' or 'cloud')
+   */
+  gcp: GcpLoggerOptionsSchema.optional(),
 });
 
 export type LoggerOptions = z.infer<typeof LoggerOptionsSchema>;

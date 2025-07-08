@@ -16,6 +16,7 @@ import _ = require('lodash');
 import {addColor, colorStack, ColorStrategy} from '../colors';
 import {buildTimestampGenerator} from '../timestamp';
 import {writeFileSync} from 'fs';
+import {GcpLogEntryBuilder} from './GcpLogEntryBuilder';
 
 type LogContext = unknown;
 export type LogFunc = (
@@ -147,6 +148,20 @@ export class Logger {
     const entry = this.asJson(level.key, arg1, arg2, arg3);
 
     switch (this.options.format) {
+      case 'gcp':
+      case 'cloud': {
+        // Use RFC3339 timestamp for GCP format
+        if (this.options.timestamp !== 'RFC3339') {
+          entry.timestamp = new Date().toISOString();
+        }
+
+        // Create GCP LogEntry
+        const gcpBuilder = new GcpLogEntryBuilder(this.options.gcp);
+        const gcpEntry = gcpBuilder.buildGcpLogEntry(entry);
+
+        return JSON.stringify(gcpEntry);
+      }
+
       case 'json':
         // Strip all colors for JSON format
         entry.message = ColorStrategy.json(entry.message);
