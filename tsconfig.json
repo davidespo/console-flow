@@ -12,7 +12,7 @@
     "noEmit": true /* Do not emit outputs. */,
     "outDir": "dist",
     "sourceMap": true /* Generates corresponding '.map' file. */,
-    "types": ["./src/types/console.d.ts", "node"],
+    "types": ["./src/types/console.d.ts", "node", "jest"],
     "baseUrl": ".",
     "paths": {
       "@src/*": ["src/*"]

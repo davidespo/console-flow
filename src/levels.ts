@@ -96,8 +96,8 @@ export const LEVEL_RAINBOW: LoggerLevel = {
       chalk.hex('#4B0082'),
       chalk.hex('#8F00FF'),
     ];
-    return text
-      .split('')
+    // Use Array.from() to properly handle Unicode characters including emojis
+    return Array.from(text)
       .map((char, i) => colors[i % colors.length](char))
       .join('');
   },

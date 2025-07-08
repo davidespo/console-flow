@@ -5,7 +5,9 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "build": "tsup",
     "prepublish": "npm run build"
   },
@@ -17,9 +19,13 @@
   "license": "MIT",
   "description": "",
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.14",
     "@types/moment": "^2.11.29",
     "@types/node": "^22.10.7",
+    "jest": "^30.0.4",
+    "jest-environment-node": "^30.0.4",
+    "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.3"
