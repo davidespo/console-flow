@@ -1,4 +1,4 @@
-import {FlowLogger} from '@src/index';
+import {FlowLogger} from '../../src/index';
 import {recurseAndThrow} from '../utils';
 
 const logger = new FlowLogger({

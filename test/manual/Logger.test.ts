@@ -1,4 +1,4 @@
-import {FlowLogger} from '@src/index';
+import {FlowLogger} from '../../src/index';
 
 const logger = new FlowLogger({
   format: 'json',

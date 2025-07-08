@@ -13,6 +13,10 @@
     "outDir": "dist",
     "sourceMap": true /* Generates corresponding '.map' file. */,
     "types": ["./src/types/console.d.ts", "node"],
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": ["src/*"]
+    }
   },
   // "include": ["src/**/*.ts", "test/**/*.ts"]
   "include": ["src/**/*", "test/**/*"],
