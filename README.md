@@ -111,13 +111,7 @@ console.rainbow('🌈 Special rainbow message! 🦄');
 
 Beautiful, colored console output with structured data:
 
-```
-my-app - [INFO][2025-07-08T15:52:08] User logged in {"userId":123,"action":"login"}
-my-app - [SUCCESS][2025-07-08T15:52:08] Operation completed successfully
-my-app - [ERROR][2025-07-08T15:52:08] Database connection failed
-Error: Connection timeout
-    at Database.connect (db.ts:15:10)
-```
+![CLI Format Example](./assets/demo-screenshot.png)
 
 ### JSON Format
 
@@ -338,6 +332,12 @@ npm run test:watch
 
 ```bash
 npm run build
+```
+
+### Publishing
+
+```bash
+npm publish --access public
 ```
 
 ## Roadmap
